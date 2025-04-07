@@ -1,8 +1,6 @@
-# Week 3 - - Message Brokers
+# Week 3 - Message Brokers
 
 > Distributed and Networking Programming - Spring 2025
-
-Your tasks for this lab:
 
 Your task for this lab is to use [RabbitMQ](https://rabbitmq.com/) as a message broker for the system on the picture:
 
@@ -58,7 +56,7 @@ Example of log file:
 [2025-04-06T12:10:43.253910] test1 : squared : 25
 ```
 
-## Checklist and Grading Criteria #TODO
+## Checklist and Grading Criteria
 
 Submitted solution should satisfy the requirements listed below. Failing to satisfy an item will result in partial grade deduction or an assignment failure (depending on the severity).
 
