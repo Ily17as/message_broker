@@ -1,0 +1,61 @@
+name: Autograding Tests
+on:
+- push
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: self-hosted
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Test 0 # Log file not created if logger is not booted 
+      id: test-0
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        setup-command: 'tests/setup.sh'
+        test-name: Test 0
+        command: 'docker run -q --rm --network test -e PYTHONDONTWRITEBYTECODE=1 -v .:/app -w /app python:3 bash -c "umask 000 && pip install -qqq pika && tests/test0.sh"'
+        timeout: 2
+        max-score: 1
+    - name: Test 1 # match number of messages sent to number of original messages logged 
+      id: test-1
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        setup-command: 'tests/setup.sh'
+        test-name: Test 1
+        command: 'docker run -q --rm --network test -e PYTHONDONTWRITEBYTECODE=1 -v .:/app -w /app python:3 bash -c "umask 000 && pip install -qqq pika && tests/test1.sh"'
+        timeout: 2
+        max-score: 2
+    - name: Test 2 # match number of messages sent to number of all messages logged 
+      id: test-2
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        setup-command: 'tests/setup.sh'
+        test-name: Test 2
+        command: 'docker run -q --rm --network test -e PYTHONDONTWRITEBYTECODE=1 -v .:/app -w /app python:3 bash -c "umask 000 && pip install -qqq pika && tests/test2.sh"'
+        timeout: 2
+        max-score: 3
+    - name: Test 3 # match raw numbers to proccesed numbers
+      id: test-3
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        setup-command: 'tests/setup.sh'
+        test-name: Test 3
+        command: 'docker run -q --rm --network test -e PYTHONDONTWRITEBYTECODE=1 -v .:/app -w /app python:3 bash -c "umask 000 && pip install -qqq pika && tests/test3.sh"'
+        timeout: 2
+        max-score: 4
+    - name: Cleanup
+      run: 'docker stop rabbitmq && docker container prune -f && docker network rm test'
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST-0_RESULTS: "${{steps.test-0.outputs.result}}"
+        TEST-1_RESULTS: "${{steps.test-1.outputs.result}}"
+        TEST-2_RESULTS: "${{steps.test-2.outputs.result}}"
+        TEST-3_RESULTS: "${{steps.test-3.outputs.result}}"
+      with:
+        runners: test-0,test-1,test-2,test-3
