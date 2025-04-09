@@ -20,7 +20,28 @@ def publish(publisher_name: str, max_number: int, delay: float):
     for i in range(0, max_number):
         number = random.randint(0,100)
         # TO WRITE start ******************************************************
-        
+        channel.exchange_declare(
+            exchange=EXCHANGE_NAME,
+            exchange_type='fanout',
+            durable=True
+        )
+
+        message = {
+            'sender': publisher_name,
+            'type': 'original',
+            'number': number
+        }
+
+        channel.basic_publish(
+            exchange=EXCHANGE_NAME,
+            routing_key='',
+            body=json.dumps(message),
+            properties=pika.BasicProperties(
+                delivery_mode=2
+            )
+        )
+
+        print(f'{publisher_name} : original : {number}')
         # TO WRITE finish *****************************************************
         time.sleep(delay)
 
